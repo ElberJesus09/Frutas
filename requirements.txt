@@ -6,3 +6,4 @@ roboflow
 filterpy
 opencv-python
 sort
+gunicorn
