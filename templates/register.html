@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            box-sizing: border-box;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        button {
+            background-color: #0056b3;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #004494;
+        }
+
+        p {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Registro de Usuario</h1>
+        <form method="POST" action="/register">
+            <input type="text" name="name" placeholder="Nombre" required><br>
+            <input type="text" name="last_name" placeholder="Apellido" required><br>
+            <input type="email" name="email_address" placeholder="Correo Electrónico (Gmail o Hotmail)" pattern="[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)" title="Solo se permiten correos de Gmail, Hotmail o Outlook." required><br>
+            <input type="text" name="dni" placeholder="Dni" required><br>
+            <input type="text" name="phone" placeholder="Teléfono (debe empezar con 9)" pattern="9\d{8}" title="El teléfono debe comenzar con 9 y tener 9 dígitos." maxlength="9" required><br>
+            <input type="text" name="address" placeholder="Dirección" required><br>
+            <input type="text" name="username" placeholder="Nombre de usuario" required><br>
+            <input type="password" name="password" placeholder="Contraseña (mín. 8 caracteres, incluyendo mayúscula, número y especial)" pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" title="La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial." required><br>
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio de sesión</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            box-sizing: border-box;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        button {
+            background-color: #0056b3;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #004494;
+        }
+
+        p {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Inicio de sesión</h1>
+        <form method="POST" action="/login">
+            <input type="text" name="username" placeholder="Nombre de usuario" required><br>
+            <input type="password" name="password" placeholder="Contraseña" required><br>
+            <button type="submit">Iniciar sesión</button>
+        </form>
+        <p>¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></p>
+    </div>
+</body>
+</html>

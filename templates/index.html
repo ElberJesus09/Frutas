@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIDEF</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: linear-gradient(to bottom, #E3F2FD, #E1F5FE);
+        }
+
+        header {
+            background-color: #1565C0;
+            color: #FFFFFF;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 20%;
+            background-color: #90CAF9;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            border-right: 1px solid #64B5F6;
+            position: relative;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            text-align: left;
+            cursor: pointer;
+            position: flex;
+            
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #64B5F6;
+            border-radius: 5px;
+            z-index: 1000;
+            width: 80%;
+        }
+
+        .dropdown button {
+            padding: 10px 20px;
+            width: 100%;
+            background-color: white;
+            border: none;
+            text-align: left;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .dropdown button:hover {
+            background-color: #BBDEFB;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #E1F5FE;
+        }
+
+        .video-container {
+            flex: 1;
+            border: 1px solid #64B5F6;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #E3F2FD;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message {
+            font-size: 1.2em;
+            text-align: center;
+            color: #1565C0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        #videoFeed {
+            width: 75%;
+            height: 73%;
+            object-fit: cover;
+            display: none;
+            border-radius: 10px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            margin: 0 10px;
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .controls button svg {
+            width: 40px;
+            height: 40px;
+            transition: fill 0.3s;
+        }
+
+        .controls button#startButton svg {
+            fill: #1E88E5;
+        }
+
+        .controls button#stopButton svg {
+            fill: #BDBDBD;
+        }
+
+        footer {
+            background-color: #1565C0;
+            color: #FFFFFF;
+            text-align: center;
+            padding: 10px;
+            font-size: 1em;
+        }
+        .name-user{
+            color: #FFFFFF;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 2em;
+            text-transform: capitalize;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        SIST. INTELIGENTE DE DETECCIÓN  DE FRUTAS
+    </header>
+
+    <div class="container">
+        <aside  class="sidebar">
+            <h3  class="name-user" onclick="toggleDropdown()">{{ current_user.username }}</h3>
+            
+            <div class="dropdown" id="dropdownMenu">
+                <button onclick="cerrarSesion()">Cerrar sesión</button>
+            </div>
+            <h3><a href="{{ url_for('reporte') }}" style="text-decoration: none; color: #1565C0;">Ver Reporte</a></h3>
+        </aside>
+        
+        <main class="main-content">
+            <div class="video-container" id="videoContainer">
+                <div class="message" id="mensajeInicial">Presione "Comenzar" para iniciar la detección de calidad de la fruta</div>
+                <img src="{{ url_for('Detector_Camara') }}" alt="Video en Vivo" id="videoFeed" />
+            </div>
+
+            <div class="controls">
+                <button id="startButton" onclick="iniciarDeteccion()">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.4086 9.35258C23.5305 10.5065 23.5305 13.4935 21.4086 14.6474L8.59662 21.6145C6.53435 22.736 4 21.2763 4 18.9671L4 5.0329C4 2.72368 6.53435 1.26402 8.59661 2.38548L21.4086 9.35258Z"/>
+                    </svg>
+                </button>
+                <button id="stopButton" onclick="detenerDeteccion()">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z"/>
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        UNPRG - 2020 - I - EPICI
+    </footer>
+
+    <script>
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            const isVisible = dropdownMenu.style.display === 'block';
+            dropdownMenu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function modificarPerfil() {
+            alert('Redirigiendo a la página de modificación de perfil.');
+            // Aquí puedes redirigir a la página de modificación del perfil
+        }
+
+        function cerrarSesion() {
+            window.location.href = '/logout';
+        }
+
+        function iniciarDeteccion() {
+            const mensajeInicial = document.getElementById('mensajeInicial');
+            const videoFeed = document.getElementById('videoFeed');
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+
+            mensajeInicial.style.display = 'none';
+            videoFeed.style.display = 'block';
+
+            startButton.querySelector('svg').style.fill = '#BDBDBD';
+            stopButton.querySelector('svg').style.fill = '#D32F2F';
+
+            alert('Detección iniciada');
+        }
+
+        function detenerDeteccion() {
+            const mensajeInicial = document.getElementById('mensajeInicial');
+            const videoFeed = document.getElementById('videoFeed');
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+
+            videoFeed.style.display = 'none';
+            mensajeInicial.style.display = 'block';
+
+            startButton.querySelector('svg').style.fill = '#1E88E5';
+            stopButton.querySelector('svg').style.fill = '#BDBDBD';
+
+            alert('Detección detenida');
+        }
+    </script>
+</body>
+</html>

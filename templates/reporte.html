@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Frutas Detectadas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #F5F5F5;
+        }
+        h1 {
+            text-align: center;
+            color: #1565C0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0 20px;
+        }
+        .user-info {
+            font-size: 16px;
+            color: #333;
+        }
+        .user-info span {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        form {
+            text-align: right;
+        }
+        form input[type="date"], form button {
+            padding: 10px;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #1565C0;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .btn-volver {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #1565C0;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .btn-volver:hover {
+            background-color: #0d47a1;
+        }
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 14px;
+        }
+        .pagination svg {
+            width: 20px;
+            height: 20px;
+            fill: #1565C0;
+            cursor: pointer;
+        }
+        .pagination svg.disabled {
+            fill: #ccc;
+            cursor: not-allowed;
+        }
+        .pagination span {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reporte de Frutas Detectadas</h1>
+    
+    <!-- Encabezado con usuario y filtro -->
+    <div class="header">
+        <div class="user-info">
+            Usuario: <span>{{ current_user.username }}</span>
+        </div>
+        <form method="get" action="{{ url_for('reporte') }}">
+            <label for="fecha_inicio">Fecha Inicio:</label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+            <label for="fecha_fin">Fecha Fin:</label>
+            <input type="date" id="fecha_fin" name="fecha_fin" value="{{ fecha_fin }}">
+            <button type="submit">Filtrar</button>
+        </form>
+    </div>
+
+    <!-- Tabla de detecciones -->
+    <table>
+        <thead>
+            <tr>
+                <th>Clase</th>
+                <th>Confianza</th>
+                <th>Centro X</th>
+                <th>Centro Y</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for deteccion in detecciones %}
+            <tr>
+                <td>{{ deteccion[0] }}</td>
+                <td>{{ '%.2f' % deteccion[1] }}</td>
+                <td>{{ '%.2f' % deteccion[2] }}</td>
+                <td>{{ '%.2f' % deteccion[3] }}</td>
+                <td>{{ deteccion[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Footer con paginación y botón de volver al inicio -->
+    <div class="footer">
+        <!-- Botón de volver al inicio -->
+        <a href="/" class="btn-volver">Volver al inicio</a>
+
+        <!-- Paginación -->
+        <div class="pagination">
+            {% if pagina > 1 %}
+            <a href="{{ url_for('reporte', pagina=pagina-1, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" title="Anterior">
+                <svg viewBox="0 0 24 24"><path d="M15 19L8 12L15 5" /></svg>
+            </a>
+            {% else %}
+            <svg class="disabled" viewBox="0 0 24 24"><path d="M15 19L8 12L15 5" /></svg>
+            {% endif %}
+
+            <span>{{ pagina }} de {{ total_paginas }}</span>
+
+            {% if pagina < total_paginas %}
+            <a href="{{ url_for('reporte', pagina=pagina+1, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin) }}" title="Siguiente">
+                <svg viewBox="0 0 24 24"><path d="M9 5L16 12L9 19" /></svg>
+            </a>
+            {% else %}
+            <svg class="disabled" viewBox="0 0 24 24"><path d="M9 5L16 12L9 19" /></svg>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
