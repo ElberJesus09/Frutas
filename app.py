@@ -9,22 +9,16 @@ import numpy as np
 from sort import Sort
 import sqlite3
 
-def create_app():
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dataUsuarios.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.secret_key = 'tu_secreto_super_seguro'
-
-    db.init_app(app)
-    bcrypt.init_app(app)
-    login_manager.init_app(app)
-    
-    return app
+# Configuración inicial de la aplicación Flask
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dataUsuarios.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'tu_secreto_super_seguro'
 
 # Inicialización de extensiones
-db = SQLAlchemy()
-bcrypt = Bcrypt()
-login_manager = LoginManager()
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "Por favor, inicia sesión para acceder a esta página."
 
@@ -45,8 +39,7 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-app = create_app()
-
+# Rutas relacionadas con la autenticación
 @app.route('/')
 @login_required
 def index():
@@ -129,6 +122,36 @@ rf = Roboflow(api_key="Vd2I88rNGk6HVseIwsiE")
 project = rf.workspace().project("frutasestados")
 modelo = project.version(2).model
 
+def setup_database():
+    db = sqlite3.connect("deteccion_frutas.db")
+    cursor = db.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS detecciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            clase INTEGER,
+            confianza REAL,
+            bbox_x REAL,
+            bbox_y REAL,
+            fecha TEXT
+        );
+    """)
+    db.commit()
+    return db
+
+# Consulta SQL para insertar una detección
+insert_query = """
+    INSERT INTO detecciones (clase, confianza, bbox_x, bbox_y, fecha)
+    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+"""
+
+# Función para insertar la detección en la base de datos
+def insert_detection(cursor, insert_query, cls, conf, bbox_center):
+    try:
+        data = (cls, float(conf), float(bbox_center[0]), float(bbox_center[1]))
+        cursor.execute(insert_query, data)
+    except Exception as e:
+        print(f"Error al insertar detección en la base de datos: {e}")
+
 @app.route('/Detector_Camara')
 def Detector_Camara():
     def generar_video():
@@ -137,7 +160,7 @@ def Detector_Camara():
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Alto del video
         cap.set(cv2.CAP_PROP_FPS, 30)  # Establecer FPS
 
-        db = sqlite3.connect("deteccion_frutas.db")
+        db = setup_database()
         cursor = db.cursor()
 
         while True:
@@ -183,10 +206,7 @@ def Detector_Camara():
                         conf = detections[closest_detection_idx, 4]
                         bbox_center = [(x1 + x2) / 2, (y1 + y2) / 2]
 
-                        cursor.execute(
-                            "INSERT INTO detecciones (clase, confianza, bbox_x, bbox_y, fecha) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
-                            (cls, float(conf), float(bbox_center[0]), float(bbox_center[1]))
-                        )
+                        insert_detection(cursor, insert_query, cls, conf, bbox_center)
                         db.commit()
 
                         color = colors.get(cls, (255, 255, 255))
@@ -264,4 +284,6 @@ def reporte():
     )
 
 if __name__ == '__main__':
+    with app.app_context():  # Esto asegura que estás dentro del contexto de la aplicación
+        db.create_all()  # Crea todas las tablas definidas en tus modelos
     app.run(debug=True)
